@@ -10,6 +10,7 @@ module OPENSets.State {
     public wrongOptions: Phaser.Group;
     public triesCounter: Services.TriesCounterService;
     public randomizeGameModelService: Services.RandomizeGameModelService;
+    public httpService: Services.HttpRequestService;
     public nextButton: Phaser.Button;
 
     private iteration: number;
@@ -19,6 +20,7 @@ module OPENSets.State {
       super();
       this.gameState = Helpers.GameState.getInstance();
       this.randomizeGameModelService = new Services.RandomizeGameModelService();
+      this.httpService = new Services.HttpRequestService();
       this.iteration = 0;
     }
 
@@ -84,7 +86,8 @@ module OPENSets.State {
         this.game.world.centerX,
         this.buttonsInitialY + 60,
         'next-button',
-        this.nextIteration,
+        this.httpService.startGame,
+        //this.nextIteration,
         this,
         0, // over frame
         1, // normal frame
