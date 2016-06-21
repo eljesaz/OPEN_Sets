@@ -3,6 +3,7 @@ module OPENSets.Helpers {
     private static _instance: GameState = new GameState();
     public randomizedPairs: Array<Models.Pair>;
     public wrongTriesTreshold: number;
+    public guid: string;
 
     public static getInstance(): GameState {
       return GameState._instance;

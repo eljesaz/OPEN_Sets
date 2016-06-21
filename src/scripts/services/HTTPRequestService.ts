@@ -1,28 +1,27 @@
 module OPENSets.Services {
   export class HttpRequestService {
-    public counter: number;
-    public guidService: Services.GUIDGenerator;
-    public guid: string;
     public gameName: string;
+    private gameState: Helpers.GameState;
 
-    constructor() { }
+    constructor() {
+      this.gameState = Helpers.GameState.getInstance();
+    }
 
     startGame(): void {
 
-      this.guidService = new Services.GUIDGenerator();
-      this.guid = this.guidService.generateGUID();
       let data: string;
       this.gameName = 'Sets';
 
-       let xhr: XMLHttpRequest = new XMLHttpRequest();
-      xhr.addEventListener('onreadystatechange', () => {
-        if (xhr.readyState === 4) {
-          console.log(xhr.responseText);
+      let http: XMLHttpRequest = new XMLHttpRequest();
+      http.onreadystatechange = () => {
+        if (http.readyState === 4 && http.status === 200) {
+          this.gameState.guid = http.responseText;
+          console.log(this.gameState.guid);
         }
-      });
+      };
 
-      xhr.open('GET', 'http://localhost:3000/api/setsGameStarted/' + this.gameName, true);
-      xhr.send();
+      http.open('GET', 'http://localhost:3000/api/GameStarted/' + this.gameName, true);
+      http.send();
     }
   }
 }
