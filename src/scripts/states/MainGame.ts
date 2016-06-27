@@ -89,8 +89,7 @@ module OPENSets.State {
         this.game.world.centerX,
         this.buttonsInitialY + 60,
         'next-button',
-        this.httpService.startGame,
-        //this.nextIteration,
+        this.nextIteration,
         this,
         0, // over frame
         1, // normal frame
