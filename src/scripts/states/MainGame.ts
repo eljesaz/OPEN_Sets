@@ -8,10 +8,11 @@ module OPENSets.State {
     public transitionSound: Phaser.Sound;
 
     public wrongOptions: Phaser.Group;
-    public triesCounter: Services.TriesCounterService;
-    public randomizeGameModelService: Services.RandomizeGameModelService;
-    public httpService: Services.HttpRequestService;
     public nextButton: Phaser.Button;
+
+    public triesCounter: Services.TriesCounterService;
+    public httpService: Services.HttpRequestService;
+    public gameModelGenerationService: Services.GameModelGenerationService;
 
     private iteration: number;
     private gameState: Helpers.GameState;
@@ -19,21 +20,26 @@ module OPENSets.State {
     constructor() {
       super();
       this.gameState = Helpers.GameState.getInstance();
-      this.randomizeGameModelService = new Services.RandomizeGameModelService();
       this.httpService = new Services.HttpRequestService();
+      this.gameModelGenerationService = new Services.GameModelGenerationService();
       this.iteration = 0;
+    }
+
+    newGame(): void {
+      this.iteration = 0;
+      this.gameState.newGame();
     }
 
     nextIteration(): void {
       this.game.state.start('mainGame');
     }
 
-    getNextRandomPair(): OPENSets.Models.Pair {
+    getNextPair(): OPENSets.Models.Pair {
       return this.gameState.pairs[this.iteration++];
     }
 
-    getNextRandomAnimation(): OPENSets.Models.AnimationModel {
-      return this.gameState.animations[this.iteration];
+    getNextAnimation(): OPENSets.Models.Animation {
+      return this.gameState.getAnimations()[this.iteration];
     }
 
     create(): void {
@@ -42,13 +48,14 @@ module OPENSets.State {
       this.drawScene();
 
       if (this.iteration < this.gameState.pairs.length) {
-        let model: Models.GameModel = this.createNewGameModel(this.getNextRandomPair());
+        let model: Models.GameModel = this.createNewGameModel(this.getNextPair());
         this.drawOptions(model);
       }
       else {
         // TODO: add some graphics for game finished.
-        this.game.state.start('start');
         alert('Играта заврши!');
+        this.newGame();
+        this.game.state.start('start');
       }
 
       this.unhappySound = this.add.audio('audio-wrong-option');
@@ -57,9 +64,7 @@ module OPENSets.State {
     }
 
     createNewGameModel(pair: Models.Pair): Models.GameModel {
-      let gameModel: Models.GameModel = new Models.GameModel(pair);
-
-      gameModel = this.randomizeGameModelService.randomize(gameModel);
+      let gameModel: Models.GameModel = this.gameModelGenerationService.generateGameModelForPair(pair);
 
       return gameModel;
     }
@@ -135,7 +140,7 @@ module OPENSets.State {
     }
 
     playHappyAnimationAndSound(): void {
-      let model: Models.AnimationModel = this.getNextRandomAnimation();
+      let model: Models.Animation = this.getNextAnimation();
 
       let happyAnimation: Phaser.Sprite = this.game.add.sprite(
         this.game.world.centerX,
